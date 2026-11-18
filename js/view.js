@@ -302,9 +302,14 @@
       if (g.kind === 'drop') {
         cls += ' drop';
         if (g.foreign) html = `<small>${g.foreign.lang}</small><b class="fl">${U.esc(g.foreign.text)}</b>`;
+        if (!g.res.seenDrop) {
+          const has = this.game.s.sketches && this.game.s.sketches[g.room];
+          html += `<button class="skbtn" data-sketchbtn="${g.id}">✏️ ${has ? 'Skizze ✓' : 'Skizze'}</button>`;
+        }
       } else {
         if (g.complaint) html += '<em>Reklamation!</em>';
         else if (g.type === 'loser') html += '<em>Schlüssel weg!</em>';
+        if (g.reveal !== 'face') g.reveal = 'face';
         if (g.reveal === 'room') html += `<small>Zimmer</small><b class="num">${g.room}</b>`;
         else if (g.reveal === 'name') { cls += ' namebub'; html += `<small>Ich bin</small><b class="nm">${U.esc(g.res.first)}<br>${U.esc(g.res.last)}</b>`; }
         else {
@@ -495,13 +500,17 @@
       this.closeBook(true);
       this.setSketchMode(false);
       this.sketchOpen = true;
+      const sg = o.guestId != null ? G.guest(o.guestId) : null;
+      this.skFrozen = !!(sg && sg.kind === 'drop' && !sg.res.seenDrop && (sg.state === 'enter' || sg.state === 'wait'));
+      this.app.timeFrozen = this.skFrozen;
+      this.el.stage.classList.toggle('frozen', this.skFrozen);
       this.skRoom = room;
       this.skStrokes = (S.sketches[room] || []).map((st) => ({ c: st.c, w: st.w, p: st.p.slice() }));
       this.skColor = this.skColor || PEN_COLORS[0];
       this.skWidth = this.skWidth || 0.022;
       const el = this.el.sketch;
       el.innerHTML = `
-        <header><div><h3>Skizze</h3><div class="hint">${o.hidden ? 'für diesen Schlüssel' : 'für Schlüssel <b>' + room + '</b>'} · die Uhr läuft weiter</div></div><button class="x" data-sk="cancel" aria-label="Abbrechen">✕</button></header>
+        <header><div><h3>Skizze</h3><div class="hint">${o.hidden ? 'für diesen Schlüssel' : 'für Schlüssel <b>' + room + '</b>'} · ${this.skFrozen ? '<b class="frz">⏸ Erste Abgabe: Die Zeit steht still</b>' : 'die Uhr läuft weiter'}</div></div><button class="x" data-sk="cancel" aria-label="Abbrechen">✕</button></header>
         <div class="padwrap"><canvas class="pad"></canvas><div class="padhint">Zeichne, was du dir merken willst: Frisur, Hut, Brille …</div></div>
         <div class="tools">
           <div class="colors">${PEN_COLORS.map((c) => `<button class="sw ${c === this.skColor ? 'on' : ''}" data-color="${c}" style="--c:${c}" aria-label="Farbe"></button>`).join('')}</div>
@@ -528,6 +537,9 @@
     }
 
     closeSketch(save, silent) {
+      this.app.timeFrozen = false;
+      this.skFrozen = false;
+      this.el.stage.classList.remove('frozen');
       if (!this.sketchOpen) { if (silent) this.el.sketch.classList.remove('open'); return; }
       this.sketchOpen = false;
       this.el.sketch.classList.remove('open');
@@ -615,7 +627,7 @@
         const sk = this.hookEls[i].querySelector('.sk');
         if (sk && sk.firstChild) { sk.classList.remove('pinned'); void sk.offsetWidth; sk.classList.add('pinned'); }
       }
-      for (const rec of this.gEls.values()) if (rec.g.room === room && rec.g.kind === 'drop') this.renderGuestHand(rec);
+      for (const rec of this.gEls.values()) if (rec.g.room === room && rec.g.kind === 'drop') { this.renderGuestHand(rec); this.renderBubble(rec); }
       if (this.game.char.id === 'archivarin') this.renderSide();
     }
 
@@ -626,7 +638,7 @@
       const S = this.game.s;
       let msg = null;
       if (g.kind === 'pick' && g.reveal === 'face' && !sv.tips.face) { sv.tips.face = 1; msg = 'Dieser Gast zeigt nur sein <b>Gesicht</b>. Wer hat vorhin welchen Schlüssel abgegeben?'; }
-      else if (g.kind === 'drop' && S.n >= 2 && !sv.tips.sketch) { sv.tips.sketch = 1; msg = '✏️ <b>Skizze</b> antippen, dann den Gast: Zeichne ihn, bevor er geht.'; }
+      else if (g.kind === 'drop' && !g.res.seenDrop && !sv.tips.sketch && !this.app.opts().tutorial) { sv.tips.sketch = 1; msg = '✏️ Tippe <b>Skizze</b> am Gast: Bei der ersten Abgabe steht die Zeit still, während du zeichnest.'; }
       else if (g.kind === 'pick' && g.reveal === 'name' && !sv.tips.name) { sv.tips.name = 1; msg = 'Nur ein <b>Name</b>? Das Gästebuch (G) kennt das Zimmer.'; }
       if (msg) { K.save.save(); setTimeout(() => this.hint(msg, 4200), 500); }
     }
@@ -990,10 +1002,12 @@
       this.el.coins.textContent = U.fmt(run.coins - this.coinsPending);
       if (run.nerves !== this.lastNerves || run.maxNerves !== this.lastMax) this.renderNerves();
       // Fortschritt
-      const active = S.guests.filter((g) => g.state !== 'leave').length + S.doorQueue.length;
-      const left = Math.max(0, S.cfg.n - S.spawned) + active;
-      this.el.leftlbl.textContent = '· noch ' + left;
-      this.el.prog.style.width = (100 * (1 - left / Math.max(1, S.cfg.n))).toFixed(1) + '%';
+      // Fortschritt in Personen: wer hat abgegeben und wieder abgeholt?
+      let left = 0;
+      if (S.cast) for (const r of S.cast) if (S.residents[r].phase < 2) left++;
+      const people = S.cfg.people || 1;
+      this.el.leftlbl.textContent = '· noch ' + left + (left === 1 ? ' Gast' : ' Gäste');
+      this.el.prog.style.width = (100 * (1 - left / people)).toFixed(1) + '%';
       // Kette
       const k = Math.min(S.chain, D.CHAIN_CAP);
       const mK = 1 + (G.has('rotekarte') ? 0.2 : 0.1) * k;
@@ -1045,16 +1059,10 @@
         const hi = hookOf(g.room);
         if (hi >= 0) this.hookEls[hi].classList.add('tut');
         if (!inHand) rec.hand.classList.add('tut');
-        this.hint(`Gast gibt ab: Schlüssel an Haken <b>${g.room}</b> ziehen (oder antippen, dann Haken antippen)`, 0);
+        this.hint(`Gast gibt ab: Schlüssel an Haken <b>${g.room}</b> ziehen. Merk dir das Gesicht – oder tippe <b>✏️ Skizze</b>, dann steht die Zeit still.`, 0);
       } else {
-        const inHand = S.hand.some((e) => S.keys[e.keyId] && S.keys[e.keyId].room === g.room);
-        const hi = S.hooks.findIndex((h) => h.key != null && S.keys[h.key].room === g.room);
-        if (inHand) { rec.bubble.classList.add('tut'); this.hint(`Jetzt zum Gast mit <b>Zimmer ${g.room}</b>`, 0); }
-        else {
-          if (hi >= 0) this.hookEls[hi].classList.add('tut');
-          rec.bubble.classList.add('tut');
-          this.hint(`Gast will Schlüssel <b>${g.room}</b>: vom Brett zum Gast ziehen`, 0);
-        }
+        rec.bubble.classList.add('tut');
+        this.hint('Dieser Gast will seinen Schlüssel zurück. <b>Wer war das?</b> Zieh den richtigen Schlüssel vom Brett zu ihm.', 0);
       }
     }
     tutorialProgress() {
@@ -1203,6 +1211,14 @@
       A.init();
       const t = e.target;
       if (t.closest('[data-ui]') || t.closest('#chat') || t.closest('#book') || t.closest('.ric') || t.closest('#side') || t.closest('#sketch')) return;
+      const sb = t.closest('[data-sketchbtn]');
+      if (sb) {
+        e.preventDefault();
+        const g = this.game.guest(+sb.dataset.sketchbtn);
+        if (g && g.kind === 'drop') this.openSketch(g.room, { hidden: !!g.foreign, guestId: g.id });
+        return;
+      }
+      if (this.app.timeFrozen) return;
       this.refreshRect();
       if (this.pointer) return;
       const src = this.sketchMode ? null : this.sourceAt(t);

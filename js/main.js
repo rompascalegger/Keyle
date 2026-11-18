@@ -106,6 +106,7 @@
     },
 
     beginShift(n) {
+      this.timeFrozen = false;
       this.game.startShift(n);
       this.state = 'intro';
       A.muffle(true);
@@ -199,7 +200,7 @@
       this.last = now;
       dt = Math.min(dt, 0.1);
       const G = this.game;
-      if (G && G.s && this.state === 'play' && t >= this.hitstopUntil) {
+      if (G && G.s && this.state === 'play' && t >= this.hitstopUntil && !this.timeFrozen) {
         const ts = t < this.slowUntil ? 0.25 : 1;
         this.acc += dt * ts;
         let n = 0;

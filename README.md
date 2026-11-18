@@ -16,6 +16,8 @@ python -m http.server 5317
 
 Dann <http://localhost:5317> öffnen. Läuft auf Handy (Hochformat) und Desktop.
 
+Nach Änderungen die Versionsnummer `?v=` in `index.html` erhöhen, damit Browser und GitHub Pages keine alten Dateien mischen.
+
 **Steuerung**
 
 - Ziehen: Schlüssel vom Gast an den Haken (Abgabe) oder vom Haken zum Gast (Rückgabe).
@@ -24,12 +26,12 @@ Dann <http://localhost:5317> öffnen. Läuft auf Handy (Hochformat) und Desktop.
 
 ## Was drin ist
 
-- **Gedächtnis:** Wer einen Schlüssel zurückverlangt, hat ihn vorher in derselben Schicht sichtbar abgegeben. Ab Schicht 2 zeigen viele Gäste nur ihr Gesicht. Das Gästebuch kennt Namen und Zimmer, aber keine Gesichter.
-- **Skizzen:** Gäste beim Abgeben zeichnen (Knopf *Skizze*, Taste `S` oder Doppelklick). Die Skizze hängt als Notiz am Haken und im Gästebuch.
+- **Gedächtnis:** Wer einen Schlüssel zurückverlangt, hat ihn vorher in derselben Schicht sichtbar abgegeben – und nennt weder Zimmer noch Namen. Nur das Gesicht zählt. Das Gästebuch kennt Namen und Zimmer, aber keine Gesichter.
+- **Skizzen:** Bei der ersten Abgabe eines Gastes erscheint *✏️ Skizze* am Tresen: Während du zeichnest, steht die Zeit still. Später geht es auch über den Knopf *Skizze*, Taste `S` oder Doppelklick, dann läuft die Uhr weiter. Die Skizze hängt als Notiz am Haken und im Gästebuch.
 - **Personas:** 30 handgemachte Stammgäste mit Spleen und Spruch (Kapitän mit Papagei, Vampirgräfin, Baronin mit Turmfrisur, Pantomime …), dazu ein Generator mit 35 Frisuren, 27 Hüten, 11 Brillen, 10 Bärten, 18 Outfits, Haustieren auf der Schulter, Zahnlücken, Piercings und mehr.
 - **Schlüssel:** sieben Anhänger-Formen, drei Metallsorten, 30 Glücksbringer. Bis zu 32 Haken (Kapselhotel 64).
 - **Easter Eggs:** 131 Geheimnisse in 7 Kategorien (Geheimcodes, Dinge zum Antippen, Spielmomente, Atelier, Kalender, seltene Gäste, Hotelgeschichte). Jedes bringt einen Stern, die Sammlung steht im *Kuriositätenkabinett* (🥚 auf dem Titel).
-- **Kernloop:** freie Wahl, wen du bedienst; Wut-Stufen 0–5 mit Schwellen 3 / 7 / 12 / 20 / 30 s, Ansteckung der Nachbarn, Eruptionen, Reklamationen nach Fehlgriffen.
+- **Kernloop:** freie Wahl, wen du bedienst; Wut-Stufen 0–5 mit Schwellen 8 / 18 / 30 / 50 / 75 s, Ansteckung der Nachbarn, Eruptionen, Reklamationen nach Fehlgriffen.
 - **Schichten:** `n_s = 10 + 3(s−1)` Gäste, Abstand `T_s = max(1.5, 6 · 0.9^(s−1))`. Neue Regeln pro Schicht laut Konzept (Namen, Gesichter, blinde Haken, Zwillinge, Telefon, Kinder …), Bosse alle 5 Schichten (Reisegruppe, Hotelinspektor, Rockband), ab Schicht 11 Zufalls-Mutatoren.
 - **Gästetypen:** Normal, Entspannt, Eilig, Tourist (Zimmernummer in Fremdsprache), Plauderer, Schlüsselverlierer, Zwillinge, Kinder, Promi, Reklamation, Gruppen.
 - **Roguelike:** 21 Relikte (12 im Start-Pool, 9 freischaltbar), Pausenraum mit Relikt-Walzen und Kiosk, Nerven als Kaffeetassen.

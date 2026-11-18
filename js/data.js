@@ -5,7 +5,7 @@
   const D = {};
 
   // ---------- Grundregeln (Startwerte aus dem Konzept) ----------
-  D.THRESH = [0, 3, 7, 12, 20, 30];            // Wutstufen ab gefühlter Wartezeit r·x (s)
+  D.THRESH = [0, 8, 18, 30, 50, 75];           // Wutstufen ab gefühlter Wartezeit r·x (s) – grosszügig, damit Zeit zum Merken bleibt
   D.LEVELS = ['Freundlich', 'Ungeduldig', 'Genervt', 'Verärgert', 'Wütend', 'Tobend'];
   D.RAGE_COLORS = ['#57cc99', '#b8d26a', '#f4c95d', '#f08a4b', '#e84a5f', '#b5179e'];
   D.B = 1000;          // Basis
@@ -26,7 +26,8 @@
     return l;
   };
 
-  D.guestCount = (s) => 10 + 3 * (s - 1);
+  // Gäste (Personen) pro Schicht: 3, 4, 5 … Jeder gibt einmal ab und kommt einmal zurück.
+  D.guestCount = (s) => s + 2;
   D.interval = (s) => Math.max(1.5, 6 * Math.pow(0.9, s - 1));
   D.shiftMult = (s) => 1 + 0.2 * (s - 1);
 
@@ -50,7 +51,7 @@
     hurry:     { name: 'Eilig',              r: 1.5, badge: '⚡', from: 4,  w: 3, tip: 2 },
     tourist:   { name: 'Tourist',            r: 1,   badge: '📷', from: 4,  w: 2.2, kind: 'drop' },
     chatter:   { name: 'Plauderer',          r: 1,   badge: '💬', from: 6,  w: 1.4 },
-    loser:     { name: 'Schlüsselverlierer', r: 1,   badge: '❓', from: 7,  w: 1.3, kind: 'pick' },
+    loser:     { name: 'Schlüsselverlierer', r: 1,   badge: '❓', from: 99, w: 0, kind: 'pick' },
     kid:       { name: 'Kind',               r: 1.2, badge: '🧸', from: 9,  w: 1.1 },
     celeb:     { name: 'Promi',              r: 0.5, badge: '⭐', from: 11, w: 1, kind: 'pick', errCost: 2 },
     group:     { name: 'Reisegruppe',        r: 1,   badge: '🚩', from: 99, w: 0 },
@@ -160,13 +161,13 @@
 
   D.shiftNews = function (s, cfg) {
     const news = {
-      1: ['Willkommen zur Nachtschicht.', 'Wer seinen Schlüssel zurückwill, hat ihn vorher bei dir abgegeben. Merk dir die Gesichter!'],
-      2: ['Manche Gäste nennen ihr Zimmer nicht mehr. Sie zeigen nur ihr Gesicht.', '✏️ Skizze: Zeichne Gäste bei der Abgabe, die Skizze hängt dann am Haken.', 'Entspannte Gäste 🍹 lassen sich Zeit (Wut ×0.7).'],
-      3: ['Rückgabe auch mit Namen: Das Gästebuch kennt Namen, aber keine Gesichter.', '12 Haken.'],
+      1: ['Willkommen zur Nachtschicht.', 'Wer seinen Schlüssel zurückwill, sagt weder Zimmer noch Namen. Er hat ihn vorher bei dir abgegeben: Merk dir die Gesichter!', '✏️ Bei der ersten Abgabe eines Gastes: Skizze antippen – die Zeit steht still, während du zeichnest.'],
+      2: ['Entspannte Gäste 🍹 lassen sich Zeit (Wut ×0.7).'],
+      3: ['Das Gästebuch kennt Namen und Zimmer – und deine Skizzen.', '12 Haken.'],
       4: ['Eilige Gäste ⚡ (Wut ×1.5, doppeltes Trinkgeld).', 'Touristen 📷 nennen ihr Zimmer in einer Fremdsprache.'],
       5: ['Reisegruppe 🚩: Die Wut des Schlimmsten gilt für alle.', '16 Haken.'],
-      6: ['Rückgabe meist nur noch mit Gesicht.', 'Plauderer 💬 blockieren den Tresen: wegwischen!'],
-      7: ['Blinde Haken: Die Beschriftung verblasst.', 'Falsch Aufgehängtes bleibt jetzt hängen.', 'Schlüsselverlierer ❓ brauchen einen Zweitschlüssel aus dem Gästebuch.', '24 Haken.'],
+      6: ['Plauderer 💬 blockieren den Tresen: wegwischen!'],
+      7: ['Blinde Haken: Die Beschriftung verblasst.', 'Falsch Aufgehängtes bleibt jetzt hängen.', '24 Haken.'],
       8: ['Zwillinge und ähnliche Zimmernummern (213 und 231).'],
       9: ['Das Telefon klingelt. Abnehmen!', 'Kinder 🧸 vertauschen Schlüssel am Brett.'],
       10: ['Hotelinspektor 📓: Fehler kosten 2 Nerven.', '32 Haken.'],

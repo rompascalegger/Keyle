@@ -159,8 +159,8 @@
       <div class="howto">
         <div class="step" style="--i:0"><div class="ill">${key(204)}</div><div class="tx"><b>Abgabe:</b> Gäste mit erhobenem Schlüssel gehen raus. Zieh den Schlüssel an den <b>Haken mit derselben Nummer</b>.</div></div>
         <div class="step" style="--i:1"><div class="ill">${F.render(f1, 0, {})}</div><div class="tx"><b>Rückgabe:</b> Wer seinen Schlüssel zurückwill, hat ihn vorher bei dir <b>abgegeben</b>. Zieh ihn <b>vom Brett zum Gast</b>. Antippen geht auch: erst Schlüssel, dann Ziel.</div></div>
-        <div class="step" style="--i:1.5"><div class="ill">✏️</div><div class="tx"><b>Gesichter merken:</b> Bald nennen Gäste kein Zimmer mehr, sie zeigen nur ihr Gesicht. Tippe <b>Skizze</b> und dann einen abgebenden Gast: Deine Zeichnung hängt danach am Haken. Taste <b>S</b>, Doppelklick geht auch.</div></div>
-        <div class="step" style="--i:2"><div class="ill">${F.render(f2, 3, {})}</div><div class="tx"><b>Jeder Gast ist ein Timer.</b> Er wird wütender, läuft aber nie weg. Auf Stufe 5 explodiert er: <b>−1 Nerv</b> ☕.</div></div>
+        <div class="step" style="--i:1.5"><div class="ill">✏️</div><div class="tx"><b>Gesichter merken:</b> Wer seinen Schlüssel zurückwill, nennt weder Zimmer noch Namen – nur das Gesicht zählt. Bei der <b>ersten Abgabe</b> eines Gastes: <b>✏️ Skizze</b> antippen, dann <b>steht die Zeit still</b>, während du zeichnest. Die Skizze hängt danach am Haken.</div></div>
+        <div class="step" style="--i:2"><div class="ill">${F.render(f2, 3, {})}</div><div class="tx"><b>Jeder Gast ist ein Timer.</b> Er wird langsam wütender, läuft aber nie weg. Nach gut einer Minute explodiert er: <b>−1 Nerv</b> ☕.</div></div>
         <div class="step" style="--i:3"><div class="ill">⚡</div><div class="tx"><b>Punkte = 1000 ÷ Wartezeit.</b> Die ersten Sekunden zählen fast alles. Bedienungen bis 5 s bauen die <b>Kette</b> auf: BLITZ, FLOTT, OK, ZÄH.</div></div>
         <div class="step" style="--i:4"><div class="ill">${F.render(f3, 5, {})}</div><div class="tx"><b>Fehlgriff:</b> falscher Schlüssel = −1 Nerv, und der Gast kommt reklamieren. Bei 0 Nerven bist du gekündigt.</div></div>
         <div class="step" style="--i:5"><div class="ill">📖</div><div class="tx">Ab Schicht 3 nennen Gäste nur noch Namen, später nur ihr Gesicht: Das <b>Gästebuch</b> hilft, aber die Uhr läuft weiter. Tasten: <b>G</b> Gästebuch, <b>T</b> Telefon, <b>B</b> Klingel, <b>Esc</b> Pause.</div></div>
@@ -233,7 +233,7 @@
       ${boss ? `<div class="bossbar">BOSS · ${boss}</div>` : ''}
       ${mut ? `<div class="mutcard"><div class="ic">${mut.icon}</div><div><div class="n">Mutator: ${mut.name}</div><div class="d">${mut.desc}</div></div></div>` : ''}
       ${lines.length ? `<div class="newlist">${lines.map((l, i) => `<div class="it" style="--i:${i}"><span class="tag">NEU</span><span>${U.esc(l)}</span></div>`).join('')}</div>` : ''}
-      <div class="bests"><span class="chip">👥 ${cfg.n} Gäste</span><span class="chip">🔑 ${cfg.hooks} Haken</span><span class="chip">⏱ alle ~${cfg.T.toFixed(1)} s</span></div>
+      <div class="bests"><span class="chip">👥 ${cfg.people} Gäste</span><span class="chip">🔑 ${cfg.hooks} Haken</span><span class="chip">⏱ alle ~${cfg.T.toFixed(1)} s</span></div>
       <button class="btn big" data-act="go">Los geht's <span class="kbd">Enter</span></button>`);
     let done = false;
     const go = () => {

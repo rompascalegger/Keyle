@@ -82,6 +82,7 @@
       this.s.phone.next = mutator === 'telefon' ? 4 : rng.range(9, 16);
       this.run.shift = n;
       this.buildHotel();
+      this.pickCast();
       this.buildSchedule();
       this.emit('shiftstart', { cfg });
     }
@@ -188,6 +189,19 @@
       });
     }
 
+    // Wer kommt in dieser Schicht? Jeder dieser Gäste gibt genau einmal ab und holt genau einmal ab.
+    pickCast() {
+      const S = this.s, cfg = S.cfg, rng = S.rng;
+      const people = Math.min(D.guestCount(S.n), S.rooms.length);
+      const rare = S.rooms.filter((r) => S.residents[r].rare);
+      const rest = rng.shuffle(S.rooms.filter((r) => !S.residents[r].rare));
+      const cast = rare.concat(rest).slice(0, people);
+      S.cast = new Set(cast);
+      for (const r of S.rooms) S.residents[r].phase = S.cast.has(r) ? 0 : -1;
+      cfg.people = people;
+      cfg.n = people * 2;
+    }
+
     buildSchedule() {
       const S = this.s, cfg = S.cfg, rng = S.rng;
       const q = [];
@@ -202,7 +216,7 @@
           ev = { t, size, kind: cfg.boss === 'band' ? 'band' : 'group' };
           bg++;
         } else if (this.hotel.groups && left >= 3 && rng.chance(0.16)) {
-          ev = { t, size: rng.int(3, 4), kind: 'group' };
+          ev = { t, size: Math.min(left, rng.int(3, 4)), kind: 'group' };
         } else if (cfg.mutator === 'hochzeit' && left >= 3 && rng.chance(0.55)) {
           ev = { t, size: 3, kind: 'wedding' };
         } else {
@@ -233,8 +247,9 @@
         if (busy.has(r)) continue;
         const k = S.keys[S.residents[r].keyId];
         if (!k) continue;
-        if (k.loc === 'room') drop.push(r);
-        else if (k.loc === 'hook' && S.residents[r].seenDrop && S.time >= S.residents[r].backAt) pick.push(r);
+        const res = S.residents[r];
+        if (res.phase === 0 && k.loc === 'room') drop.push(r);
+        else if (res.phase === 1 && k.loc === 'hook' && S.time >= res.backAt) pick.push(r);
       }
       return { drop, pick };
     }
@@ -333,15 +348,9 @@
       return g;
     }
 
-    revealFor(g) {
-      const s = this.s.n, r = this.s.rng.next();
-      if (g.type === 'celeb') return 'face';
-      if (g.type === 'complaint') return 'room';
-      if (g.type === 'loser') return 'name';
-      if (s < 2) return 'room';
-      if (s < 3) return r < 0.55 ? 'room' : 'face';
-      if (s < 6) return r < 0.22 ? 'room' : r < 0.55 ? 'name' : 'face';
-      return r < 0.12 ? 'room' : r < 0.4 ? 'name' : 'face';
+    // Wer seinen Schlüssel zurückwill, verrät weder Zimmer noch Namen: nur das Gesicht zählt
+    revealFor() {
+      return 'face';
     }
 
     setSketch(room, strokes) {
@@ -446,6 +455,7 @@
       // Blinde Haken
       S.labelAlpha = S.cfg.blind && !this.has('messingschild') ? Math.max(0.04, 1 - S.time / 28) : 1;
 
+      if (S.spawned >= S.cfg.n) S.spawnQueue.length = 0;
       if (!S.spawnQueue.length && !S.doorQueue.length && !S.guests.length && S.spawned >= S.cfg.n) this.endShift();
     }
 
@@ -720,6 +730,7 @@
       if (g.rage > st.angriest && g.level >= 4) { st.angriest = g.rage; st.angriestRoom = g.room; }
 
       g.state = 'leave'; g.st = 0;
+      g.res.phase = g.kind === 'drop' ? 1 : 2;
       if (g.kind === 'drop') {
         g.res.seenDrop = true;
         g.res.backAt = S.time + S.rng.range(D.AWAY_MIN, D.AWAY_MAX);
@@ -769,7 +780,7 @@
       const S = this.s;
       g.complaint = true;
       g.type = 'complaint';
-      g.reveal = 'room';
+      g.reveal = 'face';
       g.line = '';
       const lv = Math.min(5, (g.awayLevel || 0) + 2);
       g.rage = Math.max(g.rage, D.THRESH[lv] + 0.01);

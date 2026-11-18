@@ -125,7 +125,7 @@
 
   // ---------------------------------------------------------------- Spielmomente
   def('play', 'g_777', '🎰', 'Jackpot', 'Zimmer 777 bedient.', 'Eine besondere Zimmernummer.');
-  def('play', 'g_chain42', '🔗', 'Kettenreaktion', 'Eine Kette von 42 Bedienungen.', 'Eine sehr lange Kette.');
+  def('play', 'g_chain42', '🔗', 'Kettenreaktion', 'Eine Kette von 30 Bedienungen in einer Schicht.', 'Eine sehr lange Kette.');
   def('play', 'g_blitz7', '⚡', 'Blitzgewitter', 'Siebenmal BLITZ hintereinander.', 'Schnell, schneller, …');
   def('play', 'g_1000', '💯', 'Tausender', '1’000 Punkte mit einer einzigen Bedienung.', 'Viele Punkte auf einmal.');
   def('play', 'g_relief', '🎊', 'Erlösung', 'Einen tobenden Gast doch noch glücklich gemacht.', 'Wut auf Stufe 5 – und dann?');
@@ -152,7 +152,7 @@
   def('play', 'g_rich', '💰', 'Trinkgeldkönig', '100 Münzen auf einmal besessen.', 'Viel Trinkgeld sparen.');
   def('play', 'g_bell', '🛎️', 'Ruhe bitte!', 'Mit der Dienstklingel vier wütende Gäste auf einmal beruhigt.', 'Ein Relikt, das klingelt.');
   def('play', 'g_latin', '🏛️', 'Latinum', 'Einen Touristen mit römischer Zimmernummer bedient.', 'CCIV ist auch eine Zahl.');
-  def('play', 'g_spare', '🔑', 'Zweitschlüssel', 'Einem Schlüsselverlierer den richtigen Zweitschlüssel gegeben.', 'Jemand hat seinen Schlüssel verloren …');
+  def('play', 'g_memory', '🐘', 'Elefantengedächtnis', 'Fünf Gäste hintereinander am Gesicht erkannt – ganz ohne Skizze.', 'Gesichter merken, ohne zu zeichnen.');
   def('play', 'g_wrongtwin', '🔀', 'Falscher Zwilling', 'Den Schlüssel des falschen Zwillings herausgegeben.', 'Zwillinge verwechseln.');
   def('play', 'g_saves5', '😅', 'Gerade noch!', 'Fünfmal einen Gast in letzter Sekunde gerettet.', 'Knapp vor der Eruption …');
   def('play', 'g_magic', '🔮', 'Magie trifft Wissenschaft', 'Merlin Mürggli und Professor Zahnrad gleichzeitig in der Lobby.', 'Ein Zauberer und ein Erfinder.');
@@ -372,7 +372,7 @@
         case 'serve': {
           const g = d.g;
           if (d.jackpot) Eg.found('g_777');
-          if (d.chain >= 42) Eg.found('g_chain42');
+          if (d.chain >= 30) Eg.found('g_chain42');
           run.blitz = d.stamp === 'blitz' ? run.blitz + 1 : 0;
           if (run.blitz >= 7) Eg.found('g_blitz7');
           if (d.pts >= 1000) Eg.found('g_1000');
@@ -383,7 +383,10 @@
           if (g.res.last === 'Nachtschatten') { const h = new Date().getHours(); if (h < 4) Eg.found('g_vampire'); }
           if (g.type === 'celeb') Eg.found('g_celeb');
           if (g.foreign && g.foreign.lang === 'LAT') Eg.found('g_latin');
-          if (g.type === 'loser') Eg.found('g_spare');
+          if (g.kind === 'pick') {
+            if (S.sketches && S.sketches[g.room]) run.mem = 0;
+            else { run.mem = (run.mem || 0) + 1; if (run.mem >= 5) Eg.found('g_memory'); }
+          }
           if (d.near) { es.saves++; K.save.save(); if (es.saves >= 5) Eg.found('g_saves5'); }
           if (g.res.twin && g.kind === 'pick') { sh.twins.add(g.room); if (sh.twins.size >= 2) Eg.found('g_twins'); }
           if (g.kind === 'pick' && g.reveal === 'face' && S.sketches && S.sketches[g.room]) Eg.found('s_helped');
@@ -396,6 +399,7 @@
           const other = S.residents[d.key.room];
           if (other && other.twin && d.g.res.twin && other.last === d.g.res.last) Eg.found('g_wrongtwin');
           run.blitz = 0;
+          run.mem = 0;
           break;
         }
         case 'eruption': sh.erupt++; break;

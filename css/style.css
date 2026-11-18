@@ -1032,3 +1032,11 @@ body.m-golden .logo h1 .le { color: #fff1b8; text-shadow: 0 0 6px #f4c430, 0 0 1
 .guest.ghosty { opacity: .62; filter: drop-shadow(0 0 8px #bcd4ff); }
 .guest.ghosty .g-face { animation: ghostFloat 2.2s ease-in-out infinite !important; }
 @keyframes ghostFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* Skizze bei der ersten Abgabe: Knopf am Gast, Zeit angehalten */
+.g-bubble .skbtn { display: block; margin: 2px auto 0; border: 0; border-radius: 999px; padding: 3px 8px; background: #2b1a10; color: #fff1b8; font: 800 9.5px/1.2 var(--font-ui); cursor: pointer; white-space: nowrap; box-shadow: 0 0 0 1.5px #e8b85a, 0 2px 6px rgba(0,0,0,.4); animation: skPulse 1.6s ease-in-out infinite; }
+.g-bubble.drop:has(.skbtn) { padding: 3px 5px; }
+@keyframes skPulse { 0%,100% { box-shadow: 0 0 0 1.5px #e8b85a, 0 2px 6px rgba(0,0,0,.4); } 50% { box-shadow: 0 0 0 3px #ffd866, 0 0 12px rgba(255,216,102,.7); } }
+.sketch .hint .frz { color: #2a7a5a; }
+#stage.frozen #lobby, #stage.frozen #gui { filter: saturate(.55) brightness(.92); }
+#stage.frozen #lobby .lobby-bg .clock { animation: pop .6s ease-in-out infinite alternate; }
