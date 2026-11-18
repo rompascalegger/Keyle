@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0d0e1a">
+<meta name="description" content="Keyle – ein Browser-Roguelike: Du bist Nachtportier. Richtiger Schlüssel, richtiger Gast, möglichst schnell.">
+<title>Keyle – Der Nachtportier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,500;1,9..144,700;1,9..144,900&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141729'/%3E%3Ccircle cx='32' cy='18' r='9' fill='none' stroke='%23e8b85a' stroke-width='5'/%3E%3Crect x='29.5' y='26' width='5' height='26' fill='%23e8b85a'/%3E%3Crect x='34' y='42' width='8' height='4' fill='%23e8b85a'/%3E%3Crect x='34' y='48' width='6' height='4' fill='%23e8b85a'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- Wiederverwendbare Symbole -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1b8"/><stop offset=".35" stop-color="#e8b85a"/><stop offset=".7" stop-color="#b9832a"/><stop offset="1" stop-color="#7a5418"/>
+    </linearGradient>
+    <symbol id="i-key" viewBox="0 0 20 48">
+      <circle cx="10" cy="8" r="6.2" fill="none" stroke="url(#brass)" stroke-width="3.4"/>
+      <rect x="8.4" y="13.5" width="3.2" height="31" rx="1.2" fill="url(#brass)"/>
+      <rect x="11" y="35" width="5.5" height="3" rx="1" fill="url(#brass)"/>
+      <rect x="11" y="40.5" width="4" height="3" rx="1" fill="url(#brass)"/>
+    </symbol>
+    <symbol id="i-key2" viewBox="0 0 20 48">
+      <circle cx="10" cy="5.5" r="4" fill="none" stroke="url(#brass)" stroke-width="2.4"/>
+      <circle cx="5" cy="10" r="3.2" fill="none" stroke="url(#brass)" stroke-width="2.2"/>
+      <circle cx="15" cy="10" r="3.2" fill="none" stroke="url(#brass)" stroke-width="2.2"/>
+      <rect x="8.6" y="12.5" width="2.8" height="32" rx="1.2" fill="url(#brass)"/>
+      <circle cx="10" cy="17" r="2.2" fill="url(#brass)"/>
+      <path d="M11 34 h6 v3 h-3 v2.5 h3 v3.5 h-6z" fill="url(#brass)"/>
+    </symbol>
+    <symbol id="i-key3" viewBox="0 0 20 48">
+      <rect x="2.5" y="1" width="15" height="13" rx="5" fill="url(#brass)"/>
+      <circle cx="10" cy="6.5" r="2.6" fill="#2a160b"/>
+      <path d="M7.5 14 h5 v29 l-2.5 3 l-2.5 -3z" fill="url(#brass)"/>
+      <path d="M12.5 20 l3 2 l-3 2 l3 2 l-3 2 l3 2 l-3 2 l3 2 l-3 2" fill="none" stroke="url(#brass)" stroke-width="1.6"/>
+      <path d="M9 17 v24" stroke="#7a5418" stroke-width=".8" opacity=".6"/>
+    </symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24">
+      <path d="M4 8h13v5a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z" fill="currentColor"/>
+      <path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H16.6" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M3 21h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path class="steam" d="M8 5c0-1.5 1.5-1.5 1.5-3M12 5c0-1.5 1.5-1.5 1.5-3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="#c99a2e"/><circle cx="12" cy="12" r="7.6" fill="#ffd866"/>
+      <path d="M12 7.5v9M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4" stroke="#b07d17" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-book" viewBox="0 0 24 24">
+      <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z" fill="currentColor"/>
+      <path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5A2.5 2.5 0 0 1 4 21.5z" fill="currentColor" opacity=".6"/>
+      <path d="M9 7h7M9 10h5" stroke="#1a1020" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6L2.5 9.3l6.6-.8z" fill="currentColor"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 48 40">
+      <path d="M6 14 Q24 2 42 14 L40 20 L32 18 L31 13 Q24 10 17 13 L16 18 L8 20Z" fill="currentColor"/>
+      <path d="M12 22 L36 22 L42 38 L6 38Z" fill="currentColor"/>
+      <circle cx="24" cy="30" r="5" fill="#0006"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="backdrop" aria-hidden="true">
+  <div class="bd-pattern"></div>
+  <div class="bd-glow"></div>
+</div>
+
+<main id="stage" aria-label="Keyle">
+  <div id="shake">
+    <header id="hud">
+      <div class="hud-score">
+        <div class="lbl">Punkte</div>
+        <div id="score" class="score">0</div>
+      </div>
+      <div class="hud-mid">
+        <div class="shiftline"><span id="shiftlbl">Schicht 1</span><span id="leftlbl" class="left"></span></div>
+        <div class="prog"><i id="prog"></i></div>
+        <div id="chain" class="chain"><span class="flame"></span><b>Kette 0</b><em>×1.0</em></div>
+      </div>
+      <div class="hud-right">
+        <div id="nerves" class="nerves" title="Nerven"></div>
+        <div class="coins" title="Trinkgeld"><svg><use href="#i-coin"/></svg><b id="coins">0</b></div>
+      </div>
+      <button id="btn-pause" class="icon-btn" data-ui aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+    </header>
+
+    <section id="lobby">
+      <div class="lobby-bg">
+        <div class="wallpaper"></div>
+        <div class="moulding"></div>
+        <div class="window w-left"><div class="sky"><div class="moon"></div><div class="rain"></div></div></div>
+        <div class="window w-right"><div class="sky"><div class="rain"></div></div></div>
+        <div class="door">
+          <div class="door-frame"></div>
+          <div class="door-glass"><div id="doorpanels" class="door-panels"><i></i><i></i><i></i></div></div>
+          <div class="door-sign">Grand Hotel Keyle</div>
+        </div>
+        <div class="clock"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#f4ead5" stroke="#b9832a" stroke-width="3"/><g stroke="#2b1a10" stroke-linecap="round"><path id="clock-h" d="M20 20 L20 11" stroke-width="2.6"/><path id="clock-m" d="M20 20 L20 6" stroke-width="1.6"/></g><circle cx="20" cy="20" r="1.8" fill="#2b1a10"/></svg></div>
+        <div class="chandelier"><i></i></div>
+        <div class="plant pl-left"></div>
+        <div class="plant pl-right"></div>
+        <div class="floor"></div>
+      </div>
+      <div id="inspector" class="inspector"></div>
+      <div id="guests"></div>
+      <div id="queue" class="queue"></div>
+    </section>
+
+    <section id="counter">
+      <div class="counter-top"></div>
+      <div class="counter-front"></div>
+    </section>
+
+    <div id="gui"></div>
+
+    <section id="boardwrap">
+      <aside id="side" class="side"></aside>
+      <div id="board" class="board"></div>
+      <div id="rants"></div>
+      <div id="dark"></div>
+      <div id="book" class="book"></div>
+      <div id="sketch" class="sketch"></div>
+    </section>
+
+    <footer id="tray">
+      <button id="btn-book" data-ui class="tray-btn"><svg><use href="#i-book"/></svg><span>Gästebuch</span></button>
+      <button id="btn-sketch" data-ui class="tray-btn"><span class="emo">✏️</span><span>Skizze</span></button>
+      <div id="hand" class="hand"></div>
+      <div class="ablage"><div id="loose" class="loose"></div><div id="relicbar" class="relicbar"></div></div>
+      <button id="phone" class="tray-btn phone" data-ui aria-label="Telefon"><svg viewBox="0 0 48 40"><use href="#i-phone"/></svg><span>Telefon</span></button>
+      <button id="btn-bell" data-ui class="tray-btn bellbtn"><span class="emo">🛎️</span><span>Klingel</span></button>
+    </footer>
+
+    <div id="chat" class="chat"></div>
+    <div id="banner" class="banner"></div>
+    <div id="golden" class="golden-veil"></div>
+    <canvas id="fx"></canvas>
+    <div id="floats"></div>
+    <div id="flash" class="flash"></div>
+    <div id="toast" class="toast"></div>
+    <div id="screens"></div>
+  </div>
+</main>
+
+<script src="js/util.js"></script>
+<script src="js/data.js"></script>
+<script src="js/faces.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/save.js"></script>
+<script src="js/eggs.js"></script>
+<script src="js/game.js"></script>
+<script src="js/view.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
